@@ -82,4 +82,4 @@ icon-resizer/
 
 ## Author
 
-Made by [your name] · [figma.com/@yourhandle](https://figma.com)
+Made by Viacheslav Ksendziuk
