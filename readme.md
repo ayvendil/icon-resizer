@@ -10,7 +10,7 @@
 [![Figma](https://img.shields.io/badge/Figma-Plugin-F34822.svg)](https://www.figma.com/community/plugin/1614670193643361353)
 
 <div align="center">
-  <img src="assets/screenshots/hero.png" alt="Icon Rescissor — Resize tab with icon selected" width="700">
+  <img src="assets/screenshots/ads 1.png" alt="Icon Rescissor — Resize tab with icon selected" width="700">
 </div>
 
 ---
@@ -72,7 +72,7 @@ Select a source icon and click **Generate all sizes →** to produce a full icon
 Enable **Component Set** to generate a Figma Component Set with `Size=` variants instead of a plain frame.
 
 <div align="center">
-  <img src="assets/screenshots/scale-set.png" alt="Icon Rescissor — Scale Set tab with stroke presets" width="700">
+  <img src="assets/screenshots/ads 2.png" alt="Icon Rescissor — Scale Set tab with stroke presets" width="700">
 </div>
 
 ### Finalize
@@ -104,7 +104,7 @@ Click the **↓** icon in the header to open the Export panel. Select any icons 
 Both copy directly to clipboard.
 
 <div align="center">
-  <img src="assets/screenshots/export.png" alt="Icon Rescissor — Export panel with icons selected" width="700">
+  <img src="assets/screenshots/ads 3.png" alt="Icon Rescissor — Export panel with icons selected" width="700">
 </div>
 
 ### Presets
