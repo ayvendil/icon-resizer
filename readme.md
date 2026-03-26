@@ -1,5 +1,3 @@
-<div align="center">[![Figma](https://img.shields.io/badge/Figma-Plugin-F34822.svg)](https://www.figma.com/community/plugin/1614670193643361353)
-
   <img src="assets/128x128.svg" alt="Icon Rescissor" width="80">
 </div>
 
