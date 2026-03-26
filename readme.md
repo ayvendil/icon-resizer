@@ -140,8 +140,4 @@ git clone https://github.com/your-username/icon-rescissor.git
 # Edit code.js and ui.html — Figma hot-reloads on save
 ```
 
----
 
-## License
-
-MIT
