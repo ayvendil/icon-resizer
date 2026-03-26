@@ -2,100 +2,146 @@
 <html>
 <head>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, sans-serif; }
-  body { background: #1e1e1e; color: #fff; padding: 16px; overflow-x: hidden; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, sans-serif; background: #111; color: #fff; padding: 16px; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+  body::-webkit-scrollbar { width: 4px; }
+  body::-webkit-scrollbar-track { background: transparent; }
+  body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  body:has(.overlay.open) { overflow-y: hidden; }
 
+  /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .header-title { font-size: 13px; font-weight: 600; color: #fff; }
-  .icon-btn {
-    background: none; border: none; cursor: pointer; padding: 4px;
-    color: #666; border-radius: 6px; transition: background .15s, color .15s;
-    display: flex; align-items: center;
-  }
+  .header-title { font-size: 13px; font-weight: 600; }
+  .header-actions { display: flex; gap: 4px; }
+  .icon-btn { background: none; border: none; cursor: pointer; padding: 4px; color: #666; border-radius: 6px; transition: background .15s, color .15s; display: flex; align-items: center; }
   .icon-btn:hover { background: #2c2c2c; color: #fff; }
-  .icon-btn.active { color: #7b61ff; }
+  .icon-btn.active { color: #F34822; }
+  .icon-btn:disabled { opacity: .3; cursor: default; }
 
-  .section-title {
-    font-size: 10px; font-weight: 600; color: #666;
-    letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px;
-  }
-  .divider { border: none; border-top: 1px solid #333; margin: 14px 0; }
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 2px; margin-bottom: 14px; background: #2c2c2c; border-radius: 8px; padding: 3px; }
+  .tab { flex: 1; padding: 6px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: none; color: #666; transition: background .15s, color .15s; }
+  .tab:hover { color: #aaa; }
+  .tab.active { background: #3d3d3d; color: #fff; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 
-  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  label { font-size: 13px; color: #ccc; }
+  /* ── Toggle group ── */
+  .toggle-group { display: flex; gap: 2px; background: #1e1e1e; border-radius: 6px; padding: 2px; }
+  .toggle-btn { flex: 1; display: flex; align-items: center; justify-content: center; padding: 4px 10px; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; background: none; color: #555; transition: background .15s, color .15s; white-space: nowrap; }
+  .toggle-btn:hover { color: #aaa; }
+  .toggle-btn.active { background: #3d3d3d; color: #fff; }
 
-  select {
-    background: #2c2c2c; color: #fff; border: 1.5px solid #444;
-    border-radius: 6px; padding: 6px 10px; font-size: 13px; cursor: pointer;
-    outline: none; min-width: 130px;
-  }
-  select:focus { border-color: #7b61ff; }
+  /* ── Single size ── */
+  .info-box { background: #2c2c2c; border-radius: 8px 8px 0 0; padding: 14px; }
+  .current-size-val { font-size: 36px; font-weight: 700; color: #F34822; line-height: 1; margin-bottom: 4px; }
+  .current-size-val.empty { color: #444; }
+  .current-size-lbl { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+  .change-row { display: flex; align-items: center; gap: 10px; }
+  .change-lbl { font-size: 12px; color: #666; white-space: nowrap; }
+  select { background: #1e1e1e; color: #fff; border: 1.5px solid #444; border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; outline: none; flex: 1; }
+  select:focus { border-color: #F34822; }
 
-  .info-box {
-    background: #2c2c2c; border-radius: 8px; padding: 10px 14px;
-    margin-bottom: 10px; display: flex; justify-content: space-between;
-  }
-  .info-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .info-val { font-size: 16px; font-weight: 700; color: #7b61ff; }
-  .info-lbl { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+  .mode-row { display: flex; align-items: center; justify-content: space-between; background: #2c2c2c; border-top: 1px solid #333; padding: 8px 12px; margin-top: -2px; }
+  .mode-row:last-of-type { border-radius: 0 0 8px 8px; }
+  .mode-row-label { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #ccc; font-weight: 500; }
 
-  .btn {
-    width: 100%; padding: 10px; border: none; border-radius: 8px;
-    font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s;
-    margin-bottom: 8px;
-  }
-  .btn-primary { background: #7b61ff; color: #fff; }
-  .btn-primary:hover { background: #6a50ee; }
-  .btn-secondary { background: #2c2c2c; color: #ccc; border: 1.5px solid #444; }
-  .btn-secondary:hover { background: #383838; }
+  /* ── iOS toggle ── */
+  .ios-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .ios-track { position: absolute; inset: 0; border-radius: 20px; background: #3a3a3a; transition: background .2s; cursor: pointer; }
+  .ios-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+  .ios-toggle input:checked + .ios-track { background: #F34822; }
+  .ios-toggle input:checked + .ios-track::after { transform: translateX(16px); }
 
-  .all-sizes { background: #2c2c2c; border-radius: 8px; padding: 10px 12px; }
-  .size-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 4px 0; font-size: 12px; color: #aaa;
-    border-bottom: 1px solid #333;
-  }
+  /* ── Multiple sizes ── */
+  .all-sizes { background: #2c2c2c; border-radius: 8px 8px 0 0; overflow: hidden; }
+  .sizes-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #333; }
+  .sizes-header-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .sizes-list { padding: 4px 12px 6px; }
+  .size-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; color: #aaa; border-bottom: 1px solid #333; }
   .size-row:last-child { border-bottom: none; }
-  .size-name { color: #fff; font-weight: 500; width: 80px; }
-  .size-badge { color: #7b61ff; }
+  .size-name { color: #fff; font-weight: 500; flex: 1; }
+  .size-val  { min-width: 34px; text-align: right; }
+  .size-badge { min-width: 44px; text-align: right; font-weight: 500; }
+  .size-badge.preset { color: #F34822; }
+  .size-badge.scale  { color: #44ffcc; }
+  .size-badge.lock   { color: #444; }
 
+  /* ── Scale config ── */
+  .scale-config { display: none; align-items: center; gap: 6px; padding: 7px 12px; border-bottom: 1px solid #333; background: #252525; }
+  .scale-config.visible { display: flex; }
+  .scale-config-label { font-size: 11px; color: #555; white-space: nowrap; }
+  .scale-input { width: 52px; background: #1e1e1e; border: 1.5px solid #3a3a3a; border-radius: 5px; color: #44ffcc; font-size: 11px; font-weight: 600; padding: 3px 6px; outline: none; text-align: center; transition: border-color .15s; }
+  .scale-input:focus { border-color: #44ffcc; }
+  .scale-arrow { color: #444; font-size: 11px; }
+  .scale-config-hint { font-size: 10px; color: #444; margin-left: auto; }
+
+  /* ── Checkboxes ── */
+  input[type="checkbox"].size-check { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; flex-shrink: 0; background: #1e1e1e; border: 1.5px solid #555; border-radius: 3px; cursor: pointer; position: relative; transition: background .15s, border-color .15s; }
+  input[type="checkbox"].size-check:checked { background: #fff; border-color: #fff; }
+  input[type="checkbox"].size-check:checked::after { content: ''; position: absolute; left: 3px; top: 0; width: 5px; height: 8px; border: 1.5px solid #000; border-top: none; border-left: none; transform: rotate(45deg); }
+
+  /* ── Buttons ── */
+  .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; margin-bottom: 8px; }
+  .btn:last-child { margin-bottom: 0; }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn-primary { background: #F34822; color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #d93d1c; }
+  .btn-secondary { background: #2c2c2c; color: #ccc; border: 1.5px solid #444; }
+  .btn-secondary:hover:not(:disabled) { background: #383838; }
+  .btn-danger { background: #2c2c2c; color: #ff6b6b; border: 1.5px solid #ff6b6b; }
+  .btn-danger:hover { background: #3a2020; border-color: #ff4444; color: #ff4444; }
+
+  /* ── Misc ── */
+  .section-title { font-size: 10px; font-weight: 600; color: #666; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .divider { border: none; border-top: 1px solid #333; margin: 14px 0; }
   .msg { margin-top: 10px; font-size: 12px; text-align: center; min-height: 16px; }
-  .msg.error { color: #ff6b6b; }
+  .msg.error   { color: #ff6b6b; }
   .msg.success { color: #6bffa0; }
+  .msg.hint    { color: #888; }
 
-  /* ── Settings panel ── */
-  #settingsPanel {
-    display: none; position: fixed; inset: 0;
-    background: #1e1e1e; padding: 16px; overflow-y: auto; z-index: 10;
-  }
-  #settingsPanel.open { display: block; }
+  /* ── Overlay panels ── */
+  .overlay { display: none; position: fixed; inset: 0; background: #1e1e1e; padding: 16px; overflow-y: auto; z-index: 10; }
+  .overlay.open { display: block; }
+  .overlay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .overlay-header span { font-size: 13px; font-weight: 600; }
 
-  .settings-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-  }
-  .settings-header span { font-size: 13px; font-weight: 600; }
-
+  /* ── Settings ── */
+  .settings-section { margin-bottom: 14px; }
+  .settings-section-title { font-size: 10px; font-weight: 600; color: #555; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
   .settings-table { width: 100%; border-collapse: collapse; }
-  .settings-table thead th {
-    font-size: 10px; color: #666; text-transform: uppercase;
-    letter-spacing: .07em; padding: 0 4px 8px; text-align: left; font-weight: 600;
-  }
+  .settings-table thead th { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: .07em; padding: 0 3px 8px; text-align: left; font-weight: 600; }
+  .settings-table thead th:last-child { width: 20px; }
   .settings-table tbody tr { border-bottom: 1px solid #2a2a2a; }
   .settings-table tbody tr:last-child { border-bottom: none; }
-  .settings-table td { padding: 5px 4px; }
-
-  .tbl-input {
-    width: 100%; background: #2c2c2c; border: 1.5px solid transparent;
-    border-radius: 5px; color: #fff; font-size: 12px; padding: 4px 6px;
-    outline: none; transition: border-color .15s;
-  }
-  .tbl-input:focus { border-color: #7b61ff; }
+  .settings-table tbody tr.dragging { opacity: .4; }
+  .settings-table tbody tr.drag-over { border-top: 2px solid #F34822; }
+  .settings-table td { padding: 4px 3px; }
+  .drag-handle { cursor: grab; color: #444; padding: 0 4px; display: flex; align-items: center; flex-shrink: 0; }
+  .drag-handle:active { cursor: grabbing; }
+  .drag-handle svg { pointer-events: none; }
+  .tbl-input { width: 100%; background: #2c2c2c; border: 1.5px solid transparent; border-radius: 5px; color: #fff; font-size: 11px; padding: 4px 5px; outline: none; transition: border-color .15s; }
+  .tbl-input:focus { border-color: #F34822; }
   .tbl-input.invalid { border-color: #ff6b6b; }
-
+  .btn-add-row { width: 100%; margin-top: 8px; padding: 7px; border: 1.5px dashed #444; border-radius: 8px; background: none; color: #666; font-size: 12px; cursor: pointer; transition: all .15s; }
+  .btn-add-row:hover { border-color: #fff; color: #fff; }
   .settings-actions { display: flex; gap: 8px; margin-top: 14px; }
   .settings-actions .btn { margin-bottom: 0; }
-  .btn-danger { background: #3a1f1f; color: #ff6b6b; border: 1.5px solid #5a2a2a; }
-  .btn-danger:hover { background: #4a2525; }
+
+  /* ── Rename pattern ── */
+  .pattern-input { width: 100%; background: #2c2c2c; border: 1.5px solid #3a3a3a; border-radius: 6px; color: #fff; font-size: 12px; padding: 7px 10px; outline: none; transition: border-color .15s; font-family: 'SF Mono', monospace; }
+  .pattern-input:focus { border-color: #F34822; }
+  .token-btn { background: #2c2c2c; border: 1.5px solid #3a3a3a; border-radius: 5px; color: #666; font-size: 10px; font-family: monospace; padding: 3px 8px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .token-btn:hover { border-color: #F34822; color: #F34822; }
+
+  /* ── Export list ── */
+  #exportList::-webkit-scrollbar { width: 4px; }
+  #exportList::-webkit-scrollbar-track { background: transparent; }
+  #exportList::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+  /* ── Resize handle ── */
+  #resizeHandle { position: fixed; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; z-index: 200; }
 </style>
 </head>
 <body>
@@ -103,230 +149,707 @@
 <!-- ── Main panel ── -->
 <div id="mainPanel">
   <div class="header">
-    <span class="header-title">Icon Resizer</span>
-    <button class="icon-btn" id="settingsBtn" title="Settings">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    </button>
-  </div>
-
-  <div class="section-title">Single size</div>
-  <div class="row">
-    <label>Icon size</label>
-    <select id="sizeSelect"></select>
-  </div>
-  <div class="info-box">
-    <div class="info-item">
-      <span class="info-val" id="previewSize">—</span>
-      <span class="info-lbl">Size px</span>
-    </div>
-    <div class="info-item">
-      <span class="info-val" id="previewStroke">—</span>
-      <span class="info-lbl">Stroke px</span>
-    </div>
-    <div class="info-item">
-      <span class="info-val" id="previewLabel">—</span>
-      <span class="info-lbl">Title</span>
+    <span class="header-title">Icon Rescissor</span>
+    <div class="header-actions">
+      <button class="icon-btn" id="exportBtn" title="Export">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Presets">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </button>
     </div>
   </div>
-  <button class="btn btn-secondary" id="applyBtn">Apply to selected</button>
 
-  <hr class="divider">
+  <div class="tabs">
+    <button class="tab active" data-tab="single">Resize</button>
+    <button class="tab" data-tab="multiple">Scale Set</button>
+  </div>
 
-  <div class="section-title">All sizes at once</div>
-  <div class="all-sizes" id="allSizesList"></div>
-  <button class="btn btn-primary" id="generateBtn" style="margin-top:10px">Generate all sizes →</button>
+  <!-- Resize tab -->
+  <div class="tab-panel active" id="panel-single">
+    <div class="info-box">
+      <div class="current-size-val empty" id="currentSize">—</div>
+      <div class="current-size-lbl">Current size</div>
+      <div class="change-row">
+        <span class="change-lbl">Change to</span>
+        <select id="sizeSelect"></select>
+      </div>
+    </div>
+    <div class="mode-row" style="border-radius:0;">
+      <div class="mode-row-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F34822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        <span>Proportional</span>
+      </div>
+      <label class="ios-toggle">
+        <input type="checkbox" id="proportionalCheckbox">
+        <span class="ios-track"></span>
+      </label>
+    </div>
+    <div class="mode-row" style="border-radius:0 0 8px 8px;">
+      <div class="mode-row-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F34822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <span>Duplicate</span>
+      </div>
+      <label class="ios-toggle">
+        <input type="checkbox" id="duplicateCheckbox">
+        <span class="ios-track"></span>
+      </label>
+    </div>
+    <button class="btn btn-primary" id="applyBtn" style="margin-top:10px">Apply size</button>
+  </div>
 
-  <hr class="divider">
+  <!-- Scale Set tab -->
+  <div class="tab-panel" id="panel-multiple">
+    <div class="all-sizes">
+      <div class="sizes-header">
+        <span class="sizes-header-label">Stroke</span>
+        <div class="toggle-group" id="strokeToggle">
+          <button class="toggle-btn active" data-stroke="preset">Preset</button>
+          <button class="toggle-btn" data-stroke="scale">Scale</button>
+          <button class="toggle-btn" data-stroke="lock">Lock</button>
+        </div>
+      </div>
+      <div class="scale-config" id="scaleConfig">
+        <span class="scale-config-label">Base</span>
+        <input class="scale-input" id="scaleBaseSize" type="number" min="1" value="24">
+        <span class="scale-arrow">px ·</span>
+        <input class="scale-input" id="scaleBaseStroke" type="number" min="0.1" step="0.1" value="2.5">
+        <span class="scale-arrow">px</span>
+        <span class="scale-config-hint" id="scaleHint">no icon selected</span>
+      </div>
+      <div class="sizes-list" id="allSizesList"></div>
+    </div>
+    <div class="mode-row">
+      <div class="mode-row-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F34822" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2z"/>
+        </svg>
+        <span>Component Set</span>
+      </div>
+      <label class="ios-toggle">
+        <input type="checkbox" id="csCheckbox">
+        <span class="ios-track"></span>
+      </label>
+    </div>
+    <button class="btn btn-primary" id="generateBtn" style="margin-top:10px">Generate all sizes →</button>
+  </div>
 
-  <div class="section-title">Finalize</div>
-  <button class="btn btn-secondary" id="detachBtn">Detach & Make Components</button>
-  <button class="btn btn-secondary" id="prefixBtn">Add Prefix by Size</button>
+  <div class="msg hint" id="duplicateHint" style="margin-top:4px"></div>
+
+  <div id="finalizeSection">
+    <hr class="divider">
+    <div class="section-title">Finalize</div>
+    <button class="btn btn-secondary" id="detachBtn">Detach & Make Components</button>
+    <button class="btn btn-secondary" id="prefixBtn">Rename icons</button>
+  </div>
 
   <div class="msg" id="msg"></div>
 </div>
 
-<!-- ── Settings panel ── -->
-<div id="settingsPanel">
-  <div class="settings-header">
-    <span>⚙ Settings</span>
-    <button class="icon-btn" id="closeSettings" title="Back">
+<!-- ── Export panel ── -->
+<div class="overlay" id="exportPanel">
+  <div class="overlay-header">
+    <span>↓ Export</span>
+    <button class="icon-btn" id="closeExport">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
   </div>
 
+  <div id="exportEmpty" style="text-align:center;padding:40px 16px;">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2a2a2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px;display:block;">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    <div style="font-size:13px;color:#444;margin-bottom:6px;font-weight:600;">No icons selected</div>
+    <div style="font-size:11px;color:#333;line-height:1.5;">Select icons on the canvas<br>to enable export</div>
+  </div>
+
+  <div id="exportReady" style="display:none;margin-bottom:14px;">
+    <div style="background:#2c2c2c;border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px;">Selected</div>
+      <div id="exportCount" style="font-size:36px;font-weight:700;color:#F34822;line-height:1;margin-bottom:2px;">0</div>
+      <div style="font-size:11px;color:#555;">icons</div>
+    </div>
+    <div id="exportList" style="background:#1e1e1e;border-radius:12px;border:1px solid #2a2a2a;height:200px;overflow-y:scroll;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#333 transparent;"></div>
+  </div>
+
+  <button class="btn btn-secondary" id="exportJsonBtn" disabled>Export to JSON</button>
+  <button class="btn btn-secondary" id="exportCssBtn" disabled>Export to CSS tokens</button>
+  <div class="msg" id="exportMsg"></div>
+</div>
+
+<!-- ── Settings / Presets panel ── -->
+<div class="overlay" id="settingsPanel">
+  <div class="overlay-header">
+    <span>Presets</span>
+    <button class="icon-btn" id="closeSettings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Library</div>
+    <div class="toggle-group" id="libraryToggle" style="width:100%;">
+      <button class="toggle-btn active" data-lib="default"   style="font-size:10px;">Default</button>
+      <button class="toggle-btn"        data-lib="lucide"    style="font-size:10px;">Lucide</button>
+      <button class="toggle-btn"        data-lib="phosphor"  style="font-size:10px;">Phosphor</button>
+      <button class="toggle-btn"        data-lib="tabler"    style="font-size:10px;">Tabler</button>
+      <button class="toggle-btn"        data-lib="heroicons" style="font-size:10px;">Heroicons</button>
+    </div>
+  </div>
+
+  <div class="settings-section-title">Sizes</div>
   <table class="settings-table">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Size px</th>
-        <th>Stroke px</th>
-        <th>Prefix</th>
-      </tr>
-    </thead>
+    <thead><tr><th style="width:20px;"></th><th>Label</th><th>Size</th><th>Stroke</th><th></th></tr></thead>
     <tbody id="settingsBody"></tbody>
   </table>
+  <button class="btn-add-row" id="addRowBtn">+ Add size</button>
 
+  <hr style="border:none;border-top:1px solid #2a2a2a;margin:14px 0;">
+
+  <div style="margin-bottom:6px;">
+    <div class="settings-section-title" style="margin-bottom:3px;">Rename pattern</div>
+    <div style="font-size:11px;color:#555;line-height:1.5;">Used by <strong style="color:#777;">Rename icons</strong> in Finalize — defines how icons get named based on their size.</div>
+  </div>
+
+  <div id="patternPreview" style="background:#2c2c2c;border-radius:7px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;">
+      <rect x="1.5" y="6" width="6.4" height="6.4" rx="1" transform="rotate(-45 1.5 6)" stroke="#9b8aff" stroke-width="1.2" fill="none"/>
+    </svg>
+    <span id="patternPreviewText" style="font-size:12px;color:#9b8aff;font-weight:500;">24/menu</span>
+  </div>
+
+  <input class="pattern-input" id="renamePatternInput" type="text" value="{size}/{name}">
+  <div style="display:flex;gap:5px;margin-top:8px;">
+    <button class="token-btn" data-token="{name}"  title="current icon name">+{name}</button>
+    <button class="token-btn" data-token="{size}"  title="icon size in px">+{size}</button>
+    <button class="token-btn" data-token="{label}" title="label from the table">+{label}</button>
+  </div>
+  <div style="margin-top:7px;display:flex;flex-direction:column;gap:4px;font-size:10px;">
+    <div style="display:flex;gap:6px;"><span style="color:#444;">•</span><span style="color:#555;"><span style="color:#666;font-family:monospace;">{name}</span> — current icon name</span></div>
+    <div style="display:flex;gap:6px;"><span style="color:#444;">•</span><span style="color:#555;"><span style="color:#666;font-family:monospace;">{size}</span> — icon size in px (e.g. <span style="color:#666;font-family:monospace;">{size}px</span> → 24px)</span></div>
+    <div style="display:flex;gap:6px;"><span style="color:#444;">•</span><span style="color:#555;"><span style="color:#666;font-family:monospace;">{label}</span> — label from the table above (e.g. Large)</span></div>
+  </div>
+
+  <hr style="border:none;border-top:1px solid #2a2a2a;margin:14px 0;">
   <div class="settings-actions">
-    <button class="btn btn-danger" id="resetBtn">Reset defaults</button>
+    <button class="btn btn-danger"  id="resetBtn">Reset defaults</button>
     <button class="btn btn-primary" id="saveBtn">Save</button>
   </div>
   <div class="msg" id="settingsMsg"></div>
 </div>
 
+<!-- Resize handle -->
+<div id="resizeHandle">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M14 14L6 14M14 14L14 6M14 14L8 8" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</div>
+
 <script>
 const DEFAULTS = [
-  { label: "Caption",   size: 12, stroke: 1.0, prefix: "12/" },
-  { label: "Body",      size: 16, stroke: 1.5, prefix: "16/" },
-  { label: "Title S",   size: 20, stroke: 1.8, prefix: "20/" },
-  { label: "Title M",   size: 24, stroke: 2.5, prefix: "24/" },
-  { label: "Title L",   size: 32, stroke: 2.8, prefix: "32/" },
-  { label: "Title XL",  size: 40, stroke: 3.2, prefix: "40/" },
-  { label: "Title XXL", size: 48, stroke: 4.5, prefix: "48/" },
-  { label: "Title 4XL", size: 56, stroke: 5.2, prefix: "56/" },
+  { label: "Micro",   size: 12, stroke: 1.0 },
+  { label: "Small",   size: 16, stroke: 1.5 },
+  { label: "Base",    size: 20, stroke: 1.8 },
+  { label: "Medium",  size: 24, stroke: 2.0 },
+  { label: "Compact", size: 28, stroke: 2.4 },
+  { label: "Large",   size: 32, stroke: 2.8 },
+  { label: "XL",      size: 40, stroke: 3.0 },
+  { label: "XXL",     size: 48, stroke: 4.5 },
+  { label: "Max",     size: 56, stroke: 5.2 },
 ];
 
-let presets = DEFAULTS.map(p => ({...p}));
+const LIBRARY_PRESETS = {
+  default: null,
+  lucide:    DEFAULTS,
+  phosphor:  [
+    { label: "Micro",   size: 12, stroke: 0.8 }, { label: "Small",   size: 16, stroke: 1.0 },
+    { label: "Base",    size: 20, stroke: 1.5 }, { label: "Medium",  size: 24, stroke: 1.5 },
+    { label: "Compact", size: 28, stroke: 1.8 }, { label: "Large",   size: 32, stroke: 2.0 },
+    { label: "XL",      size: 40, stroke: 2.0 }, { label: "XXL",     size: 48, stroke: 2.5 },
+    { label: "Max",     size: 56, stroke: 3.0 },
+  ],
+  tabler:    [
+    { label: "Micro",   size: 12, stroke: 1.0 }, { label: "Small",   size: 16, stroke: 1.5 },
+    { label: "Base",    size: 20, stroke: 1.8 }, { label: "Medium",  size: 24, stroke: 2.0 },
+    { label: "Compact", size: 28, stroke: 2.2 }, { label: "Large",   size: 32, stroke: 2.5 },
+    { label: "XL",      size: 40, stroke: 3.0 }, { label: "XXL",     size: 48, stroke: 3.5 },
+    { label: "Max",     size: 56, stroke: 4.0 },
+  ],
+  heroicons: [
+    { label: "Micro",   size: 12, stroke: 1.0 }, { label: "Small",   size: 16, stroke: 1.5 },
+    { label: "Base",    size: 20, stroke: 1.5 }, { label: "Medium",  size: 24, stroke: 1.5 },
+    { label: "Compact", size: 28, stroke: 1.8 }, { label: "Large",   size: 32, stroke: 2.0 },
+    { label: "XL",      size: 40, stroke: 2.0 }, { label: "XXL",     size: 48, stroke: 2.5 },
+    { label: "Max",     size: 56, stroke: 3.0 },
+  ],
+};
 
-function savePresets(data) {
-  // Сохранение через code.js → figma.clientStorage
-  parent.postMessage({ pluginMessage: { type: "save-presets", presets: data } }, "*");
+let presets         = DEFAULTS.map(p => ({...p}));
+let renamePattern   = "{size}/{name}";
+let selectedCount   = 0;
+let currentWidth    = null;
+let currentStroke   = null;
+let exportNodes     = [];
+let isAllComponents = false;
+let outputMode      = "section";
+let resizeMode      = "just";
+let proportional    = false;
+let strokeMode      = "preset";
+
+function post(msg) { parent.postMessage({ pluginMessage: msg }, "*"); }
+
+function copyToClipboard(text) {
+  const ta = Object.assign(document.createElement("textarea"), { value: text });
+  ta.style.cssText = "position:fixed;opacity:0";
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  document.body.removeChild(ta);
 }
 
-// ── Build main UI ──
+function showMsg(id, text, type, duration = 0) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "msg " + type;
+  if (duration) setTimeout(() => { el.textContent = ""; el.className = "msg"; }, duration);
+}
+
+function strokeBadge(p) {
+  if (strokeMode === "lock") {
+    return currentStroke !== null ? { text: currentStroke + "px", cls: "lock" } : { text: "—", cls: "lock" };
+  }
+  if (strokeMode === "scale") {
+    const configSize   = Number(document.getElementById("scaleBaseSize").value);
+    const configStroke = Number(document.getElementById("scaleBaseStroke").value);
+    const baseSize   = configSize   > 0 ? configSize   : (currentWidth  || 24);
+    const baseStroke = configStroke > 0 ? configStroke : (currentStroke || p.stroke);
+    return { text: (Math.round(baseStroke * (p.size / baseSize) * 100) / 100) + "px", cls: "scale" };
+  }
+  return { text: p.stroke + "px", cls: "preset" };
+}
+
+function updateScaleConfig() {
+  const cfg  = document.getElementById("scaleConfig");
+  const hint = document.getElementById("scaleHint");
+  cfg.classList.toggle("visible", strokeMode === "scale");
+  if (currentWidth && currentStroke !== null) {
+    document.getElementById("scaleBaseSize").value   = currentWidth;
+    document.getElementById("scaleBaseStroke").value = currentStroke;
+    hint.textContent = "synced from selection";
+    hint.style.color = "#44ffcc";
+  } else {
+    hint.textContent = "no icon selected";
+    hint.style.color = "#444";
+  }
+}
+
 function buildMain() {
-  const sel = document.getElementById("sizeSelect");
-  sel.innerHTML = presets.map((p, i) =>
-    `<option value="${i}">${p.size}px — ${p.label}</option>`
+  document.getElementById("sizeSelect").innerHTML = presets.map((p, i) =>
+    `<option value="${i}">${p.size}px · ${p.stroke}pt — ${p.label}</option>`
   ).join("");
+  buildSizesList();
+  updateGenerateBtn();
+}
 
-  const list = document.getElementById("allSizesList");
-  list.innerHTML = presets.map(p => `
-    <div class="size-row">
+function buildSizesList() {
+  document.getElementById("allSizesList").innerHTML = presets.map((p, i) => {
+    const b = strokeBadge(p);
+    return `<div class="size-row">
+      <input type="checkbox" class="size-check" data-i="${i}" checked>
       <span class="size-name">${p.label}</span>
-      <span>${p.size}px</span>
-      <span class="size-badge">${p.stroke}px</span>
-    </div>`).join("");
-
-  updatePreview();
+      <span class="size-val">${p.size}px</span>
+      <span class="size-badge ${b.cls}">${b.text}</span>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".size-check").forEach(cb => cb.addEventListener("change", updateGenerateBtn));
 }
 
-function updatePreview() {
-  const i = Number(document.getElementById("sizeSelect").value);
-  const p = presets[i];
-  if (!p) return;
-  document.getElementById("previewSize").textContent   = p.size;
-  document.getElementById("previewStroke").textContent = p.stroke;
-  document.getElementById("previewLabel").textContent  = p.label;
-  document.getElementById("msg").textContent = "";
-  document.getElementById("msg").className = "msg";
+function updateGenerateBtn() {
+  const checks     = [...document.querySelectorAll(".size-check")];
+  const allChecked = checks.every(c => c.checked);
+  const anyChecked = checks.some(c => c.checked);
+  const btn    = document.getElementById("generateBtn");
+  const suffix = selectedCount > 1 ? ` (${selectedCount} icons)` : "";
+  if (outputMode === "componentset" && !isAllComponents) {
+    btn.textContent = "Make Component ◆";
+    btn.disabled = selectedCount === 0;
+  } else {
+    btn.textContent = allChecked ? `Generate all sizes →${suffix}` : `Generate selected →${suffix}`;
+    btn.disabled = !anyChecked || selectedCount === 0;
+  }
 }
 
-document.getElementById("sizeSelect").addEventListener("change", updatePreview);
+function updateFinalize() {
+  const onMultiple = document.querySelector(".tab[data-tab='multiple']").classList.contains("active");
+  document.getElementById("finalizeSection").style.display =
+    (onMultiple && outputMode === "componentset") ? "none" : "block";
+}
 
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("panel-" + tab.dataset.tab).classList.add("active");
+    updateFinalize();
+  });
+});
+
+document.getElementById("strokeToggle").addEventListener("click", e => {
+  const btn = e.target.closest(".toggle-btn");
+  if (!btn) return;
+  strokeMode = btn.dataset.stroke;
+  document.querySelectorAll("#strokeToggle .toggle-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  updateScaleConfig();
+  buildSizesList();
+});
+document.getElementById("scaleBaseSize").addEventListener("input", buildSizesList);
+document.getElementById("scaleBaseStroke").addEventListener("input", buildSizesList);
+
+document.getElementById("duplicateCheckbox").addEventListener("change", e => { resizeMode = e.target.checked ? "duplicate" : "just"; });
+document.getElementById("proportionalCheckbox").addEventListener("change", e => { proportional = e.target.checked; });
+document.getElementById("csCheckbox").addEventListener("change", e => {
+  outputMode = e.target.checked ? "componentset" : "section";
+  updateFinalize();
+  post({ type: "refresh-selection" });
+});
+
+document.getElementById("sizeSelect").addEventListener("change", () => showMsg("msg", "", ""));
 document.getElementById("applyBtn").addEventListener("click", () => {
-  const i = Number(document.getElementById("sizeSelect").value);
-  const p = presets[i];
-  parent.postMessage({ pluginMessage: { type: "apply", size: p.size, stroke: p.stroke } }, "*");
+  const p = presets[Number(document.getElementById("sizeSelect").value)];
+  post({ type: "apply", size: p.size, stroke: p.stroke, justResize: resizeMode === "just", proportional });
 });
 
 document.getElementById("generateBtn").addEventListener("click", () => {
-  parent.postMessage({ pluginMessage: { type: "generate-all", presets } }, "*");
+  if (outputMode === "componentset" && !isAllComponents) { post({ type: "make-component" }); return; }
+  const checks   = [...document.querySelectorAll(".size-check")];
+  const selected = presets.filter((_, i) => checks[i] && checks[i].checked);
+  post({
+    type: "generate-all", presets: selected, outputMode, strokeMode,
+    scaleBaseSize:   Number(document.getElementById("scaleBaseSize").value),
+    scaleBaseStroke: Number(document.getElementById("scaleBaseStroke").value),
+  });
+});
+
+document.getElementById("detachBtn").addEventListener("click", () => post({ type: "detach-and-make-components" }));
+document.getElementById("prefixBtn").addEventListener("click", () => post({ type: "add-prefix", presets, pattern: renamePattern }));
+
+// ── Export ──
+document.getElementById("exportBtn").addEventListener("click", () => {
+  document.getElementById("exportPanel").classList.add("open");
+  document.getElementById("exportBtn").classList.add("active");
+  updateExportUI();
+});
+document.getElementById("closeExport").addEventListener("click", () => {
+  document.getElementById("exportPanel").classList.remove("open");
+  document.getElementById("exportBtn").classList.remove("active");
+});
+
+function updateExportUI() {
+  const has = selectedCount > 0;
+  const n   = exportNodes.length || selectedCount;
+  document.getElementById("exportEmpty").style.display = has ? "none"  : "block";
+  document.getElementById("exportReady").style.display = has ? "block" : "none";
+  if (has) {
+    document.getElementById("exportCount").textContent = n;
+    const rows = exportNodes.map((item, idx) => {
+      const strokeVal = item.stroke ? Math.round(item.stroke * 10) / 10 : null;
+      const sub = item.props ? item.props : `${item.size}px${strokeVal ? ' · ' + strokeVal + 'px stroke' : ''}`;
+      const border = idx < exportNodes.length - 1 ? 'border-bottom:1px solid #2a2a2a;' : '';
+      return `<div style="${border}padding:10px 14px;display:flex;flex-direction:row;align-items:center;gap:10px;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;min-width:12px;">
+          <rect x="1.5" y="6" width="6.4" height="6.4" rx="1" transform="rotate(-45 1.5 6)" stroke="#F34822" stroke-width="1.2" fill="none"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">
+          <span style="font-size:12px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name}</span>
+          <span style="font-size:10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sub}</span>
+        </div>
+      </div>`;
+    }).join("");
+    document.getElementById("exportList").innerHTML = rows;
+  }
+  const jsonBtn = document.getElementById("exportJsonBtn");
+  const cssBtn  = document.getElementById("exportCssBtn");
+  jsonBtn.className   = has ? "btn btn-primary" : "btn btn-secondary";
+  cssBtn.className    = "btn btn-secondary";
+  jsonBtn.disabled    = cssBtn.disabled = !has;
+  jsonBtn.textContent = has ? `Export ${n} icons → JSON`       : "Export to JSON";
+  cssBtn.textContent  = has ? `Export ${n} icons → CSS tokens` : "Export to CSS tokens";
+}
+
+document.getElementById("exportJsonBtn").addEventListener("click", () => {
+  copyToClipboard(JSON.stringify(exportNodes, null, 2));
+  showMsg("exportMsg", "✓ JSON copied to clipboard", "success", 2500);
+});
+document.getElementById("exportCssBtn").addEventListener("click", () => {
+  const lines = [":root {"];
+  for (const item of exportNodes) {
+    const key = item.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    lines.push(`  --icon-${key}-size: ${item.size}px;`);
+    if (item.stroke) lines.push(`  --icon-${key}-stroke: ${item.stroke}px;`);
+  }
+  lines.push("}");
+  copyToClipboard(lines.join("\n"));
+  showMsg("exportMsg", "✓ CSS tokens copied to clipboard", "success", 2500);
 });
 
 // ── Settings ──
-document.getElementById("settingsBtn").addEventListener("click", openSettings);
-document.getElementById("closeSettings").addEventListener("click", closeSettings);
-
-function openSettings() {
+document.getElementById("settingsBtn").addEventListener("click", () => {
   document.getElementById("settingsPanel").classList.add("open");
   document.getElementById("settingsBtn").classList.add("active");
-  buildSettingsTable(presets);
-}
+  document.getElementById("renamePatternInput").value = renamePattern;
+  buildSettingsTable(presets.map(p => ({...p})));
+  document.getElementById("settingsMsg").textContent = "";
+  document.querySelectorAll("#libraryToggle .toggle-btn").forEach(b => b.classList.remove("active"));
+  document.querySelector("#libraryToggle .toggle-btn[data-lib='default']").classList.add("active");
+  updatePatternPreview();
+});
+document.getElementById("closeSettings").addEventListener("click", closeSettings);
 
 function closeSettings() {
   document.getElementById("settingsPanel").classList.remove("open");
   document.getElementById("settingsBtn").classList.remove("active");
 }
 
-function buildSettingsTable(data) {
-  const tbody = document.getElementById("settingsBody");
-  tbody.innerHTML = data.map((p, i) => `
-    <tr>
-      <td><input class="tbl-input" data-i="${i}" data-key="label"  value="${p.label}"></td>
-      <td><input class="tbl-input" data-i="${i}" data-key="size"   value="${p.size}"   type="number" min="1"></td>
-      <td><input class="tbl-input" data-i="${i}" data-key="stroke" value="${p.stroke}" type="number" min="0.1" step="0.1"></td>
-      <td><input class="tbl-input" data-i="${i}" data-key="prefix" value="${p.prefix ?? p.size + '/'}"></td>
-    </tr>`).join("");
+document.getElementById("libraryToggle").addEventListener("click", e => {
+  const btn = e.target.closest(".toggle-btn");
+  if (!btn) return;
+  document.querySelectorAll("#libraryToggle .toggle-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const lib = btn.dataset.lib;
+  buildSettingsTable(lib === "default" ? presets.map(p => ({...p})) : (LIBRARY_PRESETS[lib] || []).map(p => ({...p})));
+});
+
+function switchLibraryToDefault() {
+  document.querySelectorAll("#libraryToggle .toggle-btn").forEach(b => b.classList.remove("active"));
+  document.querySelector("#libraryToggle .toggle-btn[data-lib='default']").classList.add("active");
 }
 
-document.getElementById("saveBtn").addEventListener("click", () => {
-  const inputs = document.querySelectorAll(".tbl-input");
-  const draft = presets.map(p => ({...p}));
-  let valid = true;
+function getSettingsDraft() {
+  return [...document.querySelectorAll("#settingsBody tr")].map(row => {
+    const inps = row.querySelectorAll(".tbl-input");
+    return { label: inps[0].value.trim(), size: Number(inps[1].value), stroke: Number(inps[2].value) };
+  });
+}
 
-  inputs.forEach(inp => {
-    const i = Number(inp.dataset.i), key = inp.dataset.key;
-    const val = key === "label" ? inp.value.trim() : Number(inp.value);
-    if (key !== "label" && (isNaN(val) || val <= 0)) {
-      inp.classList.add("invalid"); valid = false;
-    } else {
-      inp.classList.remove("invalid");
-      draft[i][key] = val;
-    }
+function buildSettingsTable(data) {
+  document.getElementById("settingsBody").innerHTML = data.map((p, i) => `
+    <tr draggable="true" data-i="${i}">
+      <td>
+        <div class="drag-handle">
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor">
+            <circle cx="3" cy="2.5" r="1.2"/><circle cx="7" cy="2.5" r="1.2"/>
+            <circle cx="3" cy="7"   r="1.2"/><circle cx="7" cy="7"   r="1.2"/>
+            <circle cx="3" cy="11.5" r="1.2"/><circle cx="7" cy="11.5" r="1.2"/>
+          </svg>
+        </div>
+      </td>
+      <td><input class="tbl-input" value="${p.label}"></td>
+      <td><input class="tbl-input" value="${p.size}"   type="number" min="1"></td>
+      <td><input class="tbl-input" value="${p.stroke}" type="number" min="0.1" step="0.1"></td>
+      <td>
+        <button class="icon-btn remove-row" data-i="${i}" ${data.length <= 1 ? "disabled" : ""} title="Remove">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </td>
+    </tr>`).join("");
+
+  document.querySelectorAll(".remove-row").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const draft = getSettingsDraft();
+      if (draft.length <= 1) return;
+      draft.splice(Number(btn.dataset.i), 1);
+      buildSettingsTable(draft);
+      switchLibraryToDefault();
+    });
   });
 
-  if (!valid) {
-    const m = document.getElementById("settingsMsg");
-    m.textContent = "Fix invalid values first"; m.className = "msg error"; return;
-  }
+  document.querySelectorAll("#settingsBody .tbl-input").forEach(inp => {
+    inp.addEventListener("input", switchLibraryToDefault, { once: true });
+  });
 
-  presets = draft;
-  savePresets(presets);
+  // Drag and drop
+  let dragIdx = null;
+  document.querySelectorAll("#settingsBody tr").forEach(row => {
+    row.addEventListener("dragstart", () => {
+      dragIdx = Number(row.dataset.i);
+      setTimeout(() => row.classList.add("dragging"), 0);
+    });
+    row.addEventListener("dragend", () => {
+      row.classList.remove("dragging");
+      document.querySelectorAll("#settingsBody tr").forEach(r => r.classList.remove("drag-over"));
+    });
+    row.addEventListener("dragover", e => {
+      e.preventDefault();
+      document.querySelectorAll("#settingsBody tr").forEach(r => r.classList.remove("drag-over"));
+      if (Number(row.dataset.i) !== dragIdx) row.classList.add("drag-over");
+    });
+    row.addEventListener("drop", e => {
+      e.preventDefault();
+      const dropIdx = Number(row.dataset.i);
+      if (dragIdx === null || dragIdx === dropIdx) return;
+      const draft = getSettingsDraft();
+      const [moved] = draft.splice(dragIdx, 1);
+      draft.splice(dropIdx, 0, moved);
+      buildSettingsTable(draft);
+      switchLibraryToDefault();
+      dragIdx = null;
+    });
+  });
+}
+
+document.getElementById("addRowBtn").addEventListener("click", () => {
+  const draft   = getSettingsDraft();
+  const newSize = (draft.length ? draft[draft.length - 1].size : 56) + 8;
+  draft.push({ label: "New", size: newSize, stroke: 5.5 });
+  buildSettingsTable(draft);
+  document.getElementById("settingsPanel").scrollTop = 9999;
+  switchLibraryToDefault();
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const draft   = getSettingsDraft();
+  const pattern = document.getElementById("renamePatternInput").value.trim() || "{size}/{name}";
+  let valid = true;
+  document.querySelectorAll("#settingsBody tr").forEach((row, i) => {
+    const inps = row.querySelectorAll(".tbl-input");
+    const sizeOk   = !isNaN(draft[i].size)   && draft[i].size   > 0;
+    const strokeOk = !isNaN(draft[i].stroke) && draft[i].stroke > 0;
+    inps[1].classList.toggle("invalid", !sizeOk);
+    inps[2].classList.toggle("invalid", !strokeOk);
+    if (!sizeOk || !strokeOk) valid = false;
+  });
+  if (!valid) { showMsg("settingsMsg", "Fix invalid values first", "error"); return; }
+  presets       = draft;
+  renamePattern = pattern;
+  post({ type: "save-presets", presets, pattern });
   buildMain();
-
-  const m = document.getElementById("settingsMsg");
-  m.textContent = "✓ Saved!"; m.className = "msg success";
-  setTimeout(() => closeSettings(), 800);
+  showMsg("settingsMsg", "✓ Saved!", "success");
+  setTimeout(closeSettings, 800);
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
-  parent.postMessage({ pluginMessage: { type: "reset-presets" } }, "*");
-  const m = document.getElementById("settingsMsg");
-  m.textContent = "Defaults restored"; m.className = "msg success";
-  setTimeout(() => closeSettings(), 800);
+  post({ type: "reset-presets" });
+  showMsg("settingsMsg", "Defaults restored", "success");
+  setTimeout(closeSettings, 800);
 });
+
+// ── Rename pattern preview ──
+function updatePatternPreview() {
+  const pattern = document.getElementById("renamePatternInput").value.trim();
+  const preview = document.getElementById("patternPreviewText");
+  if (!pattern) { preview.textContent = "—"; return; }
+  const draft = getSettingsDraft();
+  const mid   = Math.floor(draft.length / 2);
+  preview.textContent = pattern
+    .replace(/{name}/g,  "menu")
+    .replace(/{size}/g,  String(draft[mid]?.size  || 24))
+    .replace(/{label}/g, draft[mid]?.label || "Medium");
+}
+
+document.querySelectorAll(".token-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const inp   = document.getElementById("renamePatternInput");
+    const token = btn.dataset.token;
+    const start = inp.selectionStart, end = inp.selectionEnd;
+    inp.value = inp.value.slice(0, start) + token + inp.value.slice(end);
+    inp.selectionStart = inp.selectionEnd = start + token.length;
+    inp.focus();
+    updatePatternPreview();
+  });
+});
+document.getElementById("renamePatternInput").addEventListener("input", updatePatternPreview);
 
 // ── Messages from plugin ──
-document.getElementById("detachBtn").addEventListener("click", () => {
-  parent.postMessage({ pluginMessage: { type: "detach-and-make-components" } }, "*");
-});
-
-document.getElementById("prefixBtn").addEventListener("click", () => {
-  parent.postMessage({ pluginMessage: { type: "add-prefix", presets } }, "*");
-});
-
 window.onmessage = (e) => {
   const m = e.data.pluginMessage;
   if (!m) return;
+
   if (m.type === "init") {
-    presets = m.presets;
+    presets       = m.presets;
+    renamePattern = m.pattern || "{size}/{name}";
     buildMain();
     closeSettings();
-  } else if (m.type === "presets-saved") {
-    buildMain();
-    const sm = document.getElementById("settingsMsg");
-    sm.textContent = "✓ Saved!"; sm.className = "msg success";
-    setTimeout(() => closeSettings(), 800);
-  } else {
-    const el = document.getElementById("msg");
-    el.textContent = m.text;
-    el.className = "msg " + m.type;
+    return;
   }
+
+  if (m.type === "selection") {
+    selectedCount   = m.count;
+    currentWidth    = (m.count === 1 && m.width)             ? m.width    : null;
+    currentStroke   = (m.count === 1 && m.srcStroke != null) ? m.srcStroke : null;
+    exportNodes     = m.nodes || [];
+    isAllComponents = !!m.allComponents;
+
+    updateGenerateBtn();
+    buildSizesList();
+    updateScaleConfig();
+    updateExportUI();
+
+    const hint  = document.getElementById("duplicateHint");
+    const msgEl = document.getElementById("msg");
+    const el    = document.getElementById("currentSize");
+
+    if (m.hasSection) {
+      hint.textContent = "Sections are not supported — select icons inside";
+      document.getElementById("applyBtn").disabled    = true;
+      document.getElementById("generateBtn").disabled = true;
+      return;
+    }
+    hint.textContent = "";
+    document.getElementById("applyBtn").disabled = false;
+
+    if (m.count === 1 && m.width != null) {
+      el.textContent = m.width + (m.width !== m.height ? " × " + m.height : "") + "px";
+      el.classList.remove("empty");
+      msgEl.textContent = ""; msgEl.className = "msg";
+    } else if (m.count > 1) {
+      el.textContent = m.count + " icons";
+      el.classList.remove("empty");
+      if (m.duplicates) hint.textContent = `Looks like duplicates (${m.count} total, ${m.unique} unique)`;
+    } else {
+      el.textContent = "—"; el.classList.add("empty");
+      msgEl.textContent = ""; msgEl.className = "msg";
+    }
+    return;
+  }
+
+  if (m.type !== "presets-saved") showMsg("msg", m.text, m.type);
 };
+
+// ── Resize handle ──
+const handle = document.getElementById("resizeHandle");
+let resizing = false, startX, startY, startW, startH;
+handle.addEventListener("mousedown", e => {
+  resizing = true;
+  startX = e.clientX; startY = e.clientY;
+  startW = window.innerWidth; startH = window.innerHeight;
+  e.preventDefault();
+});
+document.addEventListener("mousemove", e => {
+  if (!resizing) return;
+  post({ type: "resize",
+    width:  Math.max(260, Math.round(startW + e.clientX - startX)),
+    height: Math.max(400, Math.round(startH + e.clientY - startY)),
+  });
+});
+document.addEventListener("mouseup", () => { resizing = false; });
 
 buildMain();
 </script>

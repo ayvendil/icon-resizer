@@ -1,106 +1,147 @@
-# Icon Resizer — Figma Plugin
+<div align="center">
+  <img src="assets/128x128.svg" alt="Icon Rescissor" width="80">
+</div>
 
-A Figma plugin tailored for Lucide-based design systems. Automatically generates all icon sizes with correct stroke weights in one click — no more manual resizing.
+# Icon Rescissor
 
-![Pipeline](pipeline.png)
+*A Figma plugin that turns raw icons into production-ready components — resize, scale stroke weights, generate size sets, and export tokens in seconds.*
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Figma](https://img.shields.io/badge/Figma-Plugin-F34822.svg)](https://www.figma.com/community/plugin/1614670193643361353)
+
+<div align="center">
+  <img src="assets/screenshots/hero.png" alt="Icon Rescissor — Resize tab with icon selected" width="700">
+</div>
 
 ---
 
 ## Features
 
-- Generate all 8 sizes at once from a single icon
-- Correct stroke weight applied automatically per size
-- Apply a single size to any selected icon
-- Auto-rename icons with a size prefix (e.g. `56/air-vent`)
-- Detach instances and convert to components in one click
-- Fully customizable presets (size, stroke, title, prefix) via Settings
-- Settings are saved between sessions via `figma.clientStorage`
-- Works with any icon type
-
----
-
-## Size Presets (default)
-
-| Title         | Size  | Stroke | Prefix |
-|---------------|-------|--------|--------|
-| Caption       | 12px  | 1.0px  | 12/    |
-| Body          | 16px  | 1.5px  | 16/    |
-| Title S       | 20px  | 1.8px  | 20/    |
-| Title M       | 24px  | 2.5px  | 24/    |
-| Title L       | 32px  | 2.8px  | 32/    |
-| Title XL      | 40px  | 3.2px  | 40/    |
-| Title XXL     | 48px  | 4.5px  | 48/    |
-| Title 4XL     | 56px  | 5.2px  | 56/    |
+- **Three stroke modes** — Preset values from your table, Scale (proportional to icon size with live calculator), or Lock (leave stroke untouched)
+- **Auto Layout output** — Generated icon sets land in horizontal Auto Layout frames, not static sections
+- **Component Set generation** — Two-step flow converts any icon into a full Figma Component Set with size variants
+- **Proportional resize** — Non-square icons scale correctly without distortion
+- **Drag to reorder** — reorder size presets by dragging rows in the Presets panel
+- **Batch rename with patterns** — define `{size}/{name}`, `{label}/{name}`, or any structure; live preview shows the result before you apply
+- **Export JSON & CSS tokens** — Select any number of icons and copy their size and stroke data in one click
+- **Library presets** — Built-in stroke tables for Lucide, Phosphor, Tabler, and Heroicons
 
 ---
 
 ## Installation
 
-> ⚠️ Requires **Figma Desktop App** — does not work in the browser.
+1. Open Figma → **Plugins** → **Browse plugins in Community**
+2. Search for **Icon Rescissor**
+3. Click **Install**
 
-1. Download or clone this repository
-2. Open Figma Desktop
-3. Menu → Plugins → Development → **Import plugin from manifest**
-4. Select the `manifest.json` file from the folder
-5. Run via Menu → Plugins → Development → **Icon Resizer**
+Or run locally:
 
----
-
-## How to use
-
-### Generate all sizes
-1. Search for an icon in the Lucide library
-2. Select the icon on your canvas
-3. Open Icon Resizer
-4. Click **Generate all sizes →**
-5. All 8 sizes appear in a row next to the original with correct parameters
-
-### Apply a single size
-1. Select one or more icons
-2. Choose the size from the dropdown
-3. Click **Apply to selected**
-
-### Finalize icons
-Once all sizes are generated, select them all and use the Finalize section:
-
-1. **Detach & Make Components** — detaches Lucide instances and converts each icon into a standalone component
-2. **Add Prefix by Size** — renames each icon based on its size (e.g. `air-vent` → `56/air-vent`). The prefix is determined automatically by matching the icon's width to your presets
-
-### Customize presets
-The plugin comes with default presets based on a standard type scale, but you can fully customize them to match your own design system.
-
-1. Click the ⚙ icon in the top right
-2. Edit any value in the table — Title, Size (px), Stroke (px) or Prefix
-3. Click **Save** — changes apply immediately and persist across sessions
-4. Click **Reset defaults** to restore the original values at any time
-
-This means the plugin adapts to any design system, not just Lucide.
-
----
-
-## Full pipeline
-
-1. Search for an icon in the Lucide library
-2. Select the icon
-3. Open Icon Resizer → **Generate all sizes →**
-4. Select all generated icons → **Detach & Make Components**
-5. Select all → **Add Prefix by Size**
-6. Place icons into your table ✅
-
----
-
-## Files
-
-```
-icon-resizer/
-├── manifest.json
-├── code.js
-├── ui.html
-└── README.md
+```bash
+git clone https://github.com/your-username/icon-rescissor.git
 ```
 
+Then in Figma: **Plugins → Development → Import plugin from manifest** → select `manifest.json`.
+
 ---
 
-## Author
+## Usage
 
-Made by Slava Ksendziuk
+### Resize
+
+Select one or more icons, pick a target size from the dropdown, and click **Apply size**.
+
+- **Proportional** — preserves aspect ratio for non-square icons
+- **Duplicate** — places a resized copy next to the original instead of resizing in place
+
+<div align="center">
+  <img src="assets/screenshots/resize.png" alt="Icon Rescissor — Resize tab" width="700">
+</div>
+
+### Scale Set
+
+Select a source icon and click **Generate all sizes →** to produce a full icon set in an Auto Layout frame.
+
+**Stroke modes:**
+
+| Mode | Behaviour |
+|------|-----------|
+| Preset | Uses stroke values from your preset table |
+| Scale | Calculates stroke proportionally from a base size and stroke — edit the Base fields or let the plugin sync from your selection |
+| Lock | Leaves stroke exactly as-is |
+
+Enable **Component Set** to generate a Figma Component Set with `Size=` variants instead of a plain frame.
+
+<div align="center">
+  <img src="assets/screenshots/scale-set.png" alt="Icon Rescissor — Scale Set tab with stroke presets" width="700">
+</div>
+
+### Finalize
+
+After generating, use the Finalize section to clean up:
+
+- **Detach & Make Components** — detaches instances and converts each icon to a proper Figma component
+- **Rename icons** — applies your rename pattern to all selected icons based on their pixel size
+
+### Rename pattern
+
+Set your naming structure in **Presets → Rename pattern**. Three tokens are available:
+
+| Token | Value |
+|-------|-------|
+| `{name}` | Base icon name (last segment after `/`) |
+| `{size}` | Icon width in px — append `px` directly: `{size}px` → `24px` |
+| `{label}` | Label from your preset table (e.g. `Large`) |
+
+A live preview updates as you type. Click token buttons to insert at cursor position.
+
+### Export
+
+Click the **↓** icon in the header to open the Export panel. Select any icons on canvas — the counter updates automatically.
+
+- **Export → JSON** — array of `{ name, size, stroke }` objects
+- **Export → CSS tokens** — `:root {}` block with `--icon-{name}-size` and `--icon-{name}-stroke` variables
+
+Both copy directly to clipboard.
+
+<div align="center">
+  <img src="assets/screenshots/export.png" alt="Icon Rescissor — Export panel with icons selected" width="700">
+</div>
+
+### Presets
+
+Click the **≡** icon to open Presets. Customize size labels, pixel values, and stroke weights. Changes save automatically between sessions.
+
+Switch between **Lucide**, **Phosphor**, **Tabler**, and **Heroicons** to load library-specific stroke tables. Editing any value switches to **Default** mode automatically. Drag rows to reorder sizes.
+
+---
+
+## Preset defaults
+
+| Label  | Size | Stroke |
+|--------|------|--------|
+| Micro  | 12px | 1.0    |
+| Small  | 16px | 1.5    |
+| Base   | 20px | 1.8    |
+| Medium | 24px | 2.5    |
+| Large  | 32px | 2.8    |
+| XL     | 40px | 3.2    |
+| XXL    | 48px | 4.5    |
+| Max    | 56px | 5.2    |
+
+---
+
+## Contributing
+
+Pull requests are welcome. For major changes, open an issue first to discuss what you'd like to change.
+
+```bash
+git clone https://github.com/your-username/icon-rescissor.git
+# Import manifest.json into Figma as a development plugin
+# Edit code.js and ui.html — Figma hot-reloads on save
+```
+
+---
+
+## License
+
+MIT

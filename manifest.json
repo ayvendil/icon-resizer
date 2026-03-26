@@ -1,8 +1,10 @@
 {
-  "name": "Icon Resizer",
-  "id": "icon-resizer-local",
+  "name": "Icon Rescissor",
+  "id": "1614670193643361353",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "editorType": ["figma"]
+  "editorType": ["figma"],
+  "networkAccess": { "allowedDomains": ["none"] },
+  "documentAccess": "dynamic-page"
 }
