@@ -1,4 +1,5 @@
-<div align="center">
+<div align="center">[![Figma](https://img.shields.io/badge/Figma-Plugin-F34822.svg)](https://www.figma.com/community/plugin/1614670193643361353)
+
   <img src="assets/128x128.svg" alt="Icon Rescissor" width="80">
 </div>
 
@@ -6,8 +7,6 @@
 
 *A Figma plugin that turns raw icons into production-ready components — resize, scale stroke weights, generate size sets, and export tokens in seconds.*
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Figma](https://img.shields.io/badge/Figma-Plugin-F34822.svg)](https://www.figma.com/community/plugin/1614670193643361353)
 
 <div align="center">
   <img src="assets/screenshots/ads 1.png" alt="Icon Rescissor — Resize tab with icon selected" width="700">
@@ -53,9 +52,7 @@ Select one or more icons, pick a target size from the dropdown, and click **Appl
 - **Proportional** — preserves aspect ratio for non-square icons
 - **Duplicate** — places a resized copy next to the original instead of resizing in place
 
-<div align="center">
-  <img src="assets/screenshots/resize.png" alt="Icon Rescissor — Resize tab" width="700">
-</div>
+
 
 ### Scale Set
 
